@@ -1,49 +1,85 @@
-import React from 'react'
-import Card from '@components/Card'
-import { useLocalization } from '../context/LocalizationWrapper';
-import { Select } from 'antd'
-import { languages } from '../constants/constants';
-import Translate from '../components/Common/Translate';
-
+import React, { useState } from "react";
+import { useRecordWebcam } from "react-record-webcam";
+import Recorder from "../assets/svgs/recorder.svg";
+import { Button } from "antd";
+import HandtalkComponent from "./HandtalkComponent";
 export default function Home() {
-    const { switchLocale } = useLocalization();
+  const {
+    activeRecordings,
+    createRecording,
+    openCamera,
+    startRecording,
+    stopRecording,
+  } = useRecordWebcam();
+  const [isRecording, setRecording] = useState(false);
+  const [recordedVideo, setRecordedVideo] = useState(null);
+  const startRecorder = async () => {
+    try {
+      const recording = await createRecording();
+      setRecording(true);
+      if (!recording) return;
+      await openCamera(recording.id);
+      await startRecording(recording.id);
+      //   await new Promise((resolve) => setTimeout(resolve, 3000));
+      // await stopRecording(recording.id);
+    } catch (error) {
+      console.error({ error });
+    }
+  };
 
-    const handleChange = (value) => {
-        switchLocale(value);
-    };
-
-    return (
-        <div className='flex flex-col gap-y-4'>
-            <div className="flex items-center justify-center gap-y-4 flex-col mt-16">
-                <h2 className='text-3xl text-white font-semibold'>
-                    <Translate text='Localization Setup Integrated' />
-                </h2>
-                <Select
-                    defaultValue={localStorage.getItem('locale') ?? 'en'}
-                    className='h-16 w-20'
-                    style={{
-                        width: '200px'
-                    }}
-                    onChange={handleChange}
-                    options={languages}
-                />
+  const stopRecorder = async () => {
+    if (isRecording) {
+      try {
+        // await stopRecording(activeRecordings[0].id);
+        const videoBlob = await stopRecording(activeRecordings[0].id);
+        setRecording(false);
+        setRecordedVideo(videoBlob);
+        console.log("recorddedd", videoBlob);
+      } catch (error) {
+        console.error({ error });
+      }
+    }
+  };
+  return (
+    <div className="flex justify-center items-center">
+      <div className="flex justify-center flex-col gap-7 items-center border min-h-[500px] max-h-full w-[500px] mt-14 rounded-md">
+        {isRecording ? (
+          activeRecordings.map((recording) => (
+            <div key={recording.id}>
+              <video ref={recording.webcamRef} autoPlay muted />
             </div>
-
-            <h2 className='text-3xl text-center text-white font-semibold mt-20'>
-                <Translate text='Libraries used in this stater' />
-            </h2>
-            <div className="grid grid-cols-5 items-center justify-center px-16 gap-4 text-LightGray">
-                <Card title="Ant Design" />
-                <Card title="React Intl" />
-                <Card title="React Query" />
-                <Card title="Axios" />
-                <Card title="Vite-Plugin-SVGR" />
-                <Card title="React-Router-DOM" />
-                <Card title="Lazy Loading" />
-                <Card title="Dayjs" />
-                <Card title="TailwindCSS" />
-                <Card title="Sass" />
-            </div>
-        </div>
-    )
+          ))
+        ) : (
+          <img className="w-[120px] h-[150px]" src={Recorder} alt="" />
+        )}
+        {/* <p className="text-white">Get ready to start camera recording</p> */}
+        {isRecording ? (
+          <>
+            <p className="text-white">Your recording is started</p>
+            <Button
+              className="text-white w-[150px] h-[42px] mb-5"
+              onClick={stopRecorder}
+            >
+              Stop Recording
+            </Button>
+          </>
+        ) : (
+          <>
+            <p className="text-white">Get ready to start camera recording</p>
+            <Button
+              className="text-white w-[150px] h-[42px]"
+              onClick={startRecorder}
+            >
+              Start Recording
+            </Button>
+          </>
+        )}
+      </div>
+      {/* {recordedVideo && (
+        // Display the recorded video
+        <video controls src={URL.createObjectURL(recordedVideo)} />
+      )} */}
+      <HandtalkComponent />
+    </div>
+  );
 }

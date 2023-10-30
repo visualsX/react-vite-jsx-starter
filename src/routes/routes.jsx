@@ -5,7 +5,7 @@ import { lazy } from "react";
 // imports
 //---------------------------
 const Home = lazy(() => import("@pages/Home"));
-const Login = lazy(() => import("@pages/Login"));
+const HandtalkComponent = lazy(() => import("@pages/HandtalkComponent"));
 
 
 
@@ -16,12 +16,8 @@ export const routes_here = [
     {
         path: "/",
         element: <Home />,
-        isPrivate: false,
+        isPrivate: true,
     },
-    {
-        path: "/login",
-        element: <Login />,
-        isPrivate: false,
-    },
+   
     //routes in objects
 ];

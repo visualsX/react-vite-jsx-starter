@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import Layout from '@layouts/Layout'
-import Login from '@pages/Login'
+// import Login from '@pages/Login'
 import { routes_here } from './routes'
 import { Route, Routes } from 'react-router-dom'
 import ScrollTop from '@components/ScrollTop'
@@ -24,7 +24,7 @@ export default function AppRoutes() {
                     {/* ================= All Routes ================ */}
                     {routes_here.map((route, key) => (
                         !isAuthenticated ?
-                            <Route key={key} path="/login" element={<Login />} />
+                            <Route key={key} path="" element={""} />
                             :
                             <Route
                                 // index
